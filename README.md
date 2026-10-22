@@ -6,7 +6,7 @@ courses I used to teach.
 
 
 The latest (and probably last) version can be dowloaded from 
-[https://www.markvanderloo.eu/files/shared/loo2024datamanagement.pdf](https://www.markvanderloo.eu/files/shared/loo2024datamanagement.pdf).
+[markvanderloo.eu/files/share/loo2024datamanagement.pdf](https://www.markvanderloo.eu/files/share/loo2024datamanagement.pdf)
 
 
 
