@@ -1,0 +1,513 @@
+
+\chapter{The faces of data}
+\label{sect:faces}
+The main purpose of this chapter is to raise awareness of the different ways
+data are used, and how and why data should be structured for a specific purpose.
+The reader is also acquainted with a few common terms related to data
+management.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Introduction}
+\label{sect:faces:introduction}
+Data are created and used for many different purposes, and it should therefore
+not be surprising that the same data occurs in different guises that are
+geared for a specific type of use.  One of the most common mistakes made in
+data analyses or data management is to take data that is structured for one
+purpose, say presentation, and try and use it in that form for another purpose like
+statistical analyses. The purpose of this chapter is to give an overview
+of the main types of uses of data, the way data is typically structured for
+each purpose, and to compare their relative advantages and disadvantages.
+
+
+
+
+The main uses of data distinguished here are storage, transport, analyses, and
+presentation. Each use comes with its own conventions of how to
+structure and manipulate data that stem from the different demands that the
+different uses imply. For example, for reliable storage, retrieval and updating
+of information it is beneficial to store each piece of information exactly
+once, while it may be beneficial for interactive data analyses to have multiple
+copies of the same data available.  Similarly, when transporting data from one
+computer system to another, it is important that data can be `packed' and
+`unpacked' quickly with a variety of tools. When presenting data, it is
+important that the relevant information can be grasped quickly by users.
+
+
+Working with data is more comfortable when data is structured especially for a
+specific purpose. As a trade-off the other purposes suffer: data formatted for
+communicating between web services is hardly fit for human interpretation. One
+important aspect of data management is therefore the ability to recognize the
+task at hand and transform data into a suitable format. 
+
+As an example, consider a table of (fictional) CO$_2$ emission figures by fuel
+source. Pay special attention to how the data are formatted.
+\begin{equation}
+\begin{tabular}{rl}
+\multicolumn{2}{l}{CO$_2$ emission (kiloton per annum)}\\
+\hline
+\textbf{fuel}    & \textbf{emission}\\
+\hline
+\multicolumn{1}{l}{Petrol}      & 215 \\
+-- of which bio                  & \phantom{0}75  \\
+\multicolumn{1}{l}{Diesel}     & 456 \\
+-- of which bio                  & \phantom{0}89  \\ 
+\hline
+\end{tabular}
+\label{eq:present}
+\end{equation}
+This type of format is very common. One frequently encounters it for example in
+official statistics publications or in financial reports of businesses.
+Table~\eqref{eq:present} is optimized so people can quickly eyeball the
+contribution of biofuels as a fraction of total emissions for each fuel type.
+As a trade-off this table is not very suited for analysis. For example, to
+derive the contribution of regular fuels, one needs to subtract the emission
+value in the second line from the value in the first line, and do this again
+for line three and four. Performing such calculations is much easier, and less
+error-prone when the analyst does not have to worry about in what line which
+data item is stored exactly.
+
+
+This situation can be improved by realizing that the first column actually
+hides a two-level classification: fuels are split into Petrol and Diesel
+while each of those is split into the bio and regular type. Knowing this, the
+same information can be represented as follows.
+%
+\begin{equation}
+\begin{tabular}{rrl}
+\hline
+\textbf{fuel}      & \textbf{type}  & \textbf{emission}\\
+\hline
+Petrol & regular  & 140 \\
+Petrol & bio      & \phantom{0}75\\
+Diesel& regular  & 367 \\
+Diesel& bio      & \phantom{0}89\\
+\hline
+\end{tabular}
+\label{eq:analyse}
+\end{equation}
+%
+The totals represented in the first table are no longer explicitly represented in
+Table~\eqref{eq:analyse}. This is because the totals in Table~\eqref{eq:present}
+present the result of an analyses while Table~\eqref{eq:analyse} represents the
+basis of an analyses, that is: the raw underlying data. The benefit of the
+second representation over the first is that it allows for more general analyses
+like computing the total contributions of regular and biofuels.
+
+A good way to think of the difference is that Table \eqref{eq:present} is a
+presentation of results, while Table \eqref{eq:analyse} represents a data set
+for analyses.  The advantage of the second for over the first is that it allows
+general analyses, like computing the total emission contribution of regular
+fuels.  Thus, although both tables communicate the same information they differ
+in area of application. Unfortunately, the presentation form is very often used
+in analyses, especially in spreadsheet software.
+
+
+Next, have a look at the following format, where the data has been transformed
+to a machine-readable string of characters.
+%
+\begin{equation}
+\begin{minipage}{0.9\linewidth}
+\begin{Verbatim}[breaklines=true]
+[{"fuel":"petrol","type":"regular","emission":140}, {"fuel":"petrol","type":"bio","emission":75}, {"fuel":"diesel","type":"regular","emission":367}, {"fuel":"diesel","type":"bio","emission":89}]
+\end{Verbatim}
+\end{minipage}%
+\label{eq:machine}
+\end{equation}
+%
+Here the little $\hookrightarrow$ indicates that a line break was inserted only
+to fit the code on the page. The actual string has no spaces and no line
+endings or newlines.  The format presented here is called javascript object
+notation (JSON).  The main purpose of this format is to provide a general way
+to represent all sorts of data in a standardized way so it can be sent from one
+piece of software to another. Now there are many of such formats, but this
+particular one is very commonly used for communication between web services and
+clients. Clearly, this format is not meant for presentation to people or for
+statistical analyses. One advantage of JSON is that it is very generic: data
+need not fit in a table to be stored in a JSON string, and in principle any
+kind of data can be packed as JSON. Another advantage is that all wide-spread
+programming languages have libraries that allow programmers to read, write, and
+manipulate JSON data. It is thus a good format to interchange data between
+different systems.
+
+
+Finally, consider the same information but now organized as it would be, 
+when stored in a database.
+%
+\begin{equation}
+\begin{tabular}{ll}
+\multicolumn{2}{l}{Fuel}\\
+\hline
+\textbf{id} & \textbf{name}\\
+\hline
+11 & petrol  \\
+12 & diesel \\
+\hline
+\end{tabular}\textrm{, }\:
+%
+\begin{tabular}{ll}
+\multicolumn{2}{l}{Type}\\
+\hline
+\textbf{id} & \textbf{name}\\
+\hline
+1 & regular \\
+2 & bio \\
+\hline
+\end{tabular}\textrm{, }\:
+%
+\begin{tabular}{llll}
+\multicolumn{3}{l}{Emission}\\
+\hline
+\textbf{id} & \textbf{fuel} & \textbf{type} & \textbf{amount} \\
+\hline
+120 & 11 &1 &140\\
+121 & 11 &2 &\phantom{0}75\\
+123 & 12 &1 &367\\
+124 & 12 &2 &\phantom{0}89\\
+\hline
+\end{tabular}
+\label{eq:database}
+\end{equation}
+Now each classification and each concept is given it's own table. There is a
+`Fuel' table where each fuel is given a meaningless identifying number, and a
+name. The same happened for the subclass `Type'. The table on emission sources
+now has a unique id for each emission, and the fuel and type are identified by
+the id's in their respective table. The reason data is stored in such a format
+in database systems is that they are optimized for consistency. For example, if
+one needs to replace the fuel name `petrol' with `gasoline', then the formats
+presented in \eqref{eq:present}, \eqref{eq:analyse}, and \eqref{eq:machine}
+require multiple changes in multiple places, which is both inefficient and
+error-prone.  The database format ensures that in case of an update, only a
+single item needs to be touched and everything else is updated immediately.
+This benefit of easy and consistent updates comes with a cost: the data in the
+Emission table is not understandable unless one knows the other tables as well.
+We shall go into more detail when we discuss relational data in
+Chapter~\ref{sect:relational}.
+
+The above examples give some intuition to why it is important to structure data
+in a way that is suited for purpose. Below the main types of uses, specific
+demands that come with it and typical tools are summarized.
+
+\paragraph{Storage.} When data is formatted for storage, this is typically done
+with the four basic operations in mind that are often referred as the CRUD
+operations.
+\begin{terminology}{CRUD}
+Creating, Retrieving, Updating, and Deleting data.
+\end{terminology}
+To facilitate this, data storage systems must have a way of uniquely
+identifying each data item entrusted to them, regardless for example of the
+order in which the data is stored.  The database example \eqref{eq:database}
+satisfies extra demands such as a form of consistency, but there are other
+storage solutions that do not satisfy this consistency but that do support CRUD
+operations. Software for data storage is often characterised as either
+relational or non-relational. The table set in \eqref{eq:database} is an
+example of how data is structured in a relational database. Examples of
+non-relational databases include key-value stores, document databases or graph
+(network) databases. 
+
+\paragraph{Transport.} When transporting data from one machine to another, it
+is important that every value can be packed, send, unpacked and recognized
+correctly. Over time many standards have been developed. Important formats
+include the JSON format that was mentioned earlier and XML (eXtensible Markup
+Language). Both formats are supported by many programming languages and they
+can therefore be used by developers to exchange information between systems. 
+The formats still leave a lot of choice for how to store data precisely. For 
+example, in \eqref{eq:machine}, the order of variables in each record is
+fuel--type--emission. Changing this order would still yield a valid JSON
+format. For this reason, developers usually fix the way a JSON or XML document
+must look like in something called a schema.
+%
+\begin{terminology}{Schema}
+A schema describes the structure of a data format for a
+specific type of data, within a chosen standard (e.g. XML, JSON).
+\end{terminology}
+%
+Both \hlink{https://json-schema.org/}{JSON} and
+\hlink{https://www.w3schools.com/xml/schema\_intro.asp}{XML} have their own
+ways of denoting a schema. Some schemas are fairly simple, such as the JSON
+schema defined by the European Statistical System for exchanging information
+about
+\hlink{https://ec.europa.eu/eurostat/cros/content/validation-report-structure\_en}{data
+validation results}. Other schemas are large and elaborate, such as the
+\hlink{https://sdmx.org}{SDMX standard}, for standardized exchange of
+statistical information between institutions. 
+
+
+\paragraph{Analysis.} To analyze data interactively, it is important that it is
+formatted so that typical operations such as filtering, plotting, and modeling
+are made as easy as possible. The most important demands are that a data set
+represents a single type of entity and that each data item represents the
+properties of one unique entity. Furthermore, there should be no duplicate
+entries and all properties should be stored in the correct type (integer,
+numeric, nominal, ordinal, text).  
+%
+\begin{terminology}{Entity type, population, entity, population unit, attribute, variable}
+In computer science and specifically in the area of databases, the term \textit{entity
+type} refers to a collection of real-world objects or events such as persons, clicks
+on a web page, buildings in some city, and so on. In statistics this concept is usually
+referred to as a \textit{population}, or target population.
+
+Similarly, in computer science an \textit{entity} is an instance of an entity
+type, while in statistics one often refers to a population element as a
+\textit{population unit}.
+
+All elements of a population (entities of an entity type) share a set of
+properties.  Computer scientists often refer to a property as
+\textit{attributes} while statisticians call them \textit{variables} or
+\textit{stochastic variables} when probabilistic properties of the data are
+important.
+\end{terminology}
+%
+In many, but not all cases (See Section~\ref{sect:faces:types}) this means that
+data is represented in a tabular format such as \eqref{eq:analyse} where each
+row represents one entity, each column represents one attribute and  each
+entity appears only once. A good rule of thumb to decide whether a tabular data
+set is fit for analyses is to answer the question: are summary statistics of
+the attribute columns meaningful? Compare for instance
+Tables~\eqref{eq:present} and~\eqref{eq:analyse}: is it meaningful to compute
+the sum of the numeric column? 
+
+\paragraph{Presentation.} The main purpose of data in a presentable format is
+to convey a message as clearly and objectively as possible. This means that
+presentation is adapted to the expected audience and one may even choose
+different presentations for different audiences. Typical tools for data
+presentation include spreadsheet software, or business intelligence software
+like Tableau. Almost all statistical software packages also offer some kind of
+support for data presentation.
+
+
+In practice, the lines between various uses of data are often blurred by
+software tools. Spreadsheet software is optimized for presentation of data but
+also offer limited analytical and data management features. Many commercial
+databases offer some form of in-database analytical capabilities mixing storage
+and analyses while users of spreadsheet software often confuse a spreadsheet
+file with a data storage format. Although this blurring can seem convenient it
+is almost always better to separate concerns and choose a specialized tool and
+data format for the task at hand. The main reason for this is that
+reproducibility, maintainability and understandability suffer when a tool is
+used for purposes for which it is not designed.  Notorious examples include
+complex interlinked sets of spreadsheets where it is very difficult to track
+how the results are derived. The lack of systematic testability as well as
+their opaqueness renders spreadsheets all but useless for reliable and
+reproducible research. They do shine when it comes to presentation, with
+features like conditional formatting or interactive pivoting. A second example
+of such misuse of a tool is when programming a data analyses in Structured Query
+Language (SQL). SQL is optimized for CRUD operations on data bases, but
+expressing analytical operations such as computin summary statistics or
+model parameters cumbersome when expressed in pure SQL. This then tends to lead
+to code that is hard to read and difficult to maintain. So as a general rule,
+it is a good idea to choose the data structure and associated tools that are
+designed for a specific type of use. 
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Data types and data manipulation}
+\label{sect:faces:types}
+We have seen that data can be formatted in different ways for different
+purposes.  The structure we use ---a database schema, a JSON string, in principle
+says nothing about the \emph{intrinsic} structure of data, which is the
+discussion of the following paragraphs.
+
+\paragraph{Relational data.} 
+The running example of the previous section is a data set where there is little
+intrinsic relation between the different data points. The only intrinsic
+structure is the fact that each entity is endowed with a number of attributes.
+The way this data is represented has no real meaning: the order of columns and
+rows in Table~\ref{eq:analyse} is of no importance. As long as we know which
+values belong to which attribute of which entity, the content of the data stays
+the same. Any analyses performed on this dataset will be insensitive to
+permutations of rows or columns as long as we refer to the columns by their
+name rather than position. Data satisfying this requirement is called
+`relational data': each relation (row in a table) represents values of
+attributes of a single population unit. Typical operations that one performs on
+relational data include filtering or sorting rows, or adding or deleting
+columns. These operations consume relational data and produce relational data.
+The result of certain analyses can also be meaningfully stored in a relational
+data set. For example grouped aggregation.
+
+There are many cases where data points represented in a data set do possess
+intrinsic interrelations, and this always requires specialized theoretical and
+computational tools to analyze. Let us look at some important practical
+examples.
+
+\paragraph{Time series.} A time series is a sequence of values (or
+value-tuples) that correspond to a sequence of equidistant times or periods.
+Examples include monthly GDP estimates, daily closing levels of the stock
+market or quarterly estimates of immigration. Many outputs in official
+statistics are as time series,  and much effort is spent on constructing them.
+Important operations performed on economic time series include inflation
+correction, taking account of calendar effects, decomposition into trend and
+seasonal effects, decomposition into long-term trend and business cycle
+effects, increasing or decreasing the frequency by disaggregation or
+aggregation, and more. All these operations have in common that they they both
+accept and produce time series. They make explicit use of the fact that data is
+organized as a time series and are therefore not invariant under permutation of
+the elements of a time series.
+
+\paragraph{Geospatial data.} This data type is used to visualise and analyse
+phenomena where geographical location or geospatial patterns are important.
+Some examples from official statistics where geospatial analyses plays a role
+include land use, population density, biodiversity, and environmental
+accounting. In geospatial data, each value is related to a point, line, or
+region (a polygon) that is represented in a certain co-ordinate system.
+Typical operations include co-ordinate transformations, geospatial smoothing,
+and merging or splitting of regions. Again, permuting the values with respect
+to their geospatial features (point, line, region) would make such operations
+useless. Also observe that again, the `typical operations' mentioned here both
+consume and produce geospatial data.
+
+
+\paragraph{Network data.} A network consists of nodes, connected by links.
+Nodes represent entities while links represent connections between them.  For
+example a client--server relationship between companies, a family link between
+persons, or a shared employer between persons.  At the time of writing,
+official statisticians are just beginning to explore the uses of network data,
+but it is likely that a more `systemic' approach to describing the economy and
+society based on network science will play a role in the future of official
+statistics. For networks, the structure \emph{is} the data. In network analyses
+one is interested in summarizing or using network structure as a means to gain
+insight in the phenomenon described by it. Typical operations on networks
+include subnetwork selection or CRUD operations like adding or deleting nodes
+or links. Again (and notice this is becoming a theme now), these operations
+consume and produce networks.
+
+
+\paragraph{Other.} There are many more data types that are useful but not
+naturally represented in relational format. Examples include images, videos, or
+event logs. All these data types come with their own `natural' transformations.
+
+By now, attentive readers have probably detected a recurring theme across
+these examples. Each data type comes with a set of `natural' operations that
+leave the data type intact. This phenomenon is so important that mathematicians
+and computer scientist have a name for it.
+\begin{terminology}{Algebraic closure} Given
+a data type $T$, and an operation that manipulates data of that type.  We say
+that $T$ is \emph{algebraicly closed} under this operation when the result of
+the operation is again of the same type $T$.
+\end{terminology}
+
+In practice, things are easier when you work in an algebraically closed system
+of operations. For example. Given a relational data set, we can develop a
+script where we first filter, then sort, and then merge the data set with
+another data set. These operations are easy to perform in sequence because the
+output of one operation can serve as input to the next. If we discover a bug
+and find out we need to merge before filtering, the only thing we need to do is
+swap the two operations. Indeed, working within an algebraically closed system
+feels so natural that one can focus on \emph{what} of the data manipulation,
+rather than at the \emph{how}.
+
+There are other advantages that are facilitated by algebraic closure. For
+example, most modern database systems are capable of re-ordering instructions
+to increase speed of execution. For example it is faster to first filter
+records and then sort them then the other way around (because there is less to
+sort that way). Algebraic systems generally come with a set of re-ordering
+rules that can be taken advantage of by software that executes it. Important
+examples of algebraic systems are the various query languages that implement
+CRUD operations for different data types. Examples include Structured Query
+Language (SQL) for relational data, Cypher for network data and Spatial SQL for
+geographic data.
+
+
+The main takeaway of this section is that it is useful to distinguish between
+\emph{data transformations} where data is manipulated but the type does not
+change, and \emph{type transformations} where data manipulation yields data of
+a new type. Third, we saw in \S\ref{sect:faces:introduction} there are format
+transformations that change the technical layout of data. 
+
+A typical step in a statistical production system starts with reading data from
+a file or database. This is a format transformation, possibly followed by a
+type transformation. For example when a JSON string is read into a relational
+format. Next, depending on the task several type-conserving transformations
+and/or type-transforming data manipulations are carried out after which the
+data is again formatted for output.
+
+
+\section*{Where are we?}
+We have seen that data is a representation of information, and that data may be
+formatted in several ways depending on its intended use. We have also seen that
+data types can be distinguished by looking at their intrinsic structure.
+Depending on intrinsic structure, a number of `natural' operations are
+associated with data that leave its characteristic structure intact. It is
+useful to distinguish between formatting, type-conserving, and type-changing
+data transformations.
+
+
+
+\newpage{}
+\section{Exercises}
+\label{sect:exfaces}
+\begin{enumerate}
+  \item Explain why Table~\eqref{eq:present} is unsuited for storage or transport of data.
+  \item Acquaint yourself with storage solutions by reading through the Wikipedia
+  entries for \hlink{https://en.wikipedia.org/wiki/Database}{Database} and
+  \hlink{https://en.wikipedia.org/wiki/NoSQL}{NoSQL}.
+  \item Find out what OLTP and OLAP means.
+  \item Explain why or not the following data structures are suitable for analyses.
+  \begin{enumerate}
+      \item 
+          \begin{tabular}{|r|lll|}
+          \hline
+                    & Alice & Bob & Carol \\
+          \hline
+          Shoe size & 38    & 43  & 41    \\
+          Income    & 3300  & 2800& 4000  \\
+          \hline
+          \end{tabular}
+      \item 
+          \begin{tabular}{|r|llll|}
+          \hline
+            Income   &   0k -- 20k   &  20k -- 40k  &  40k -- 80k   & 80K+ \\
+          \hline 
+           Amsterdam & 20\%          &   40\%       &   35\%        & 5\%  \\
+           Rotterdam & 30\%          &   30\%       &   38\%        & 2\%  \\
+           Den Haag  & 25\%          &   35\%       &   30\%        &10\%  \\
+          \hline
+          \end{tabular}
+
+      \item
+          \begin{tabular}{|r|ll|}
+          \hline
+           Name & Age  &has job \\
+          \hline
+           Dave & 36   &No      \\
+           Eve  & 5    &Yes     \\
+          \hline
+          \end{tabular}
+      \item
+\begin{tabular}{|r|ll|}
+\hline
+ Sector      & costs  &profit \\
+\hline
+ Retailers   & 50     &10     \\
+ Wholesalers & 20     & 5     \\
+ Total       & 70     &15     \\
+\hline
+\end{tabular}
+
+
+  \end{enumerate}
+\item Name three operations on image data that leave the data type intact.
+\item Explain why each of the following statements is true or false.
+\begin{enumerate}
+  \item The natural numbers $\mathbb{N}=\{1,2,\ldots\}$ are closed under multiplication.
+  \item The rational number s $\mathbb{Q}$ are closed under addition.
+  \item The real numbers $\mathbb{R}$ are closed under division.
+  \item We denote with $\Sigma^*$ the set of all finite strings that can be
+    created with an alphabet $\Sigma$. For example if $\Sigma=\{a,b,\ldots,z\}$
+    then $\Sigma^*$ is the set of all finite concatenations of letters from the
+    Latin alphabet, plus the empty string (the string without characters).
+    Statement: $\Sigma^*$ is closed under concatenation of strings (pasting one
+    string behind the other).
+ \item The function $\textrm{zero}$ returns $0$ for each value it is given. For
+       Example $\textrm{zero}(\pi)=0$. Statement: the integers $\mathbb{Z}=\{\ldots, -2, -1, 0, 1, 2,\ldots\}$ are closed under $\textrm{zero}$.
+ \item The natural numbers are closed under $\textrm{zero}$.
+ \item (Bonus question) The function $a_n$ adds the number $1$, $n$ times to
+    its input.  For example $a_3(2)=2+1+1+1=5$. Statement: the natural numbers are
+    closed under $a_\infty$.
+\end{enumerate}
+\end{enumerate}
+
+\hfill{}Check your answers on page~\pageref{sect:ansfaces}.
+

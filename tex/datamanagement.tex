@@ -1,0 +1,139 @@
+\documentclass[a4paper, 11pt]{book}
+\usepackage[english]{babel}
+\usepackage{amsmath, amssymb}
+\usepackage{enumitem}
+\usepackage{makeidx}
+\makeindex
+
+\newcommand{\version}{Version: October 2024}
+
+
+% verbatim environment, and fvextra to allow line breaks.
+\usepackage{fancyvrb}
+\usepackage{fvextra}
+
+\usepackage{natbib}
+\bibliographystyle{plainnat}
+
+% typeset inline code
+\newcommand{\code}[1]{\texttt{#1}}
+% define links
+\usepackage[hidelinks]{hyperref}
+\newcommand{\hlink}[2]{{\href{#1}{#2}}\footnote{\href{#1}{\code{#1}}}}
+
+\newcommand{\yay}{\textsf{True}}
+\newcommand{\nay}{\textsf{False}}
+
+\newcommand{\str}[1]{\texttt{"#1"}}
+
+\newtheorem{definition}{Definition}
+
+\usepackage{pgf}
+\usepackage{tikz}
+\usetikzlibrary{arrows,automata}
+
+\setcounter{tocdepth}{1}
+
+% 
+\usepackage{xcolor}
+\usepackage{framed}
+\definecolor{shadecolor}{rgb}{0.95,0.95,0.95}
+
+\usepackage{appendix}
+
+% Use a sans-serif font by default
+\renewcommand{\familydefault}{\sfdefault}
+
+
+% shaded box for important terms
+\newenvironment{terminology}[1]{
+\begin{shaded*}
+\textbf{#1\index{#1}.}\\
+}
+{
+\end{shaded*}
+}
+
+% No paragraph indentation, skip 2ex instead
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{2ex}
+
+\title{Topics in data management}
+\author{Mark van der Loo}
+\date{
+\begin{center}
+\includegraphics[height=6cm]{fig/bart_simpson_excel_is_not_a_database.jpg}
+\end{center}
+\version{}\\
+\begin{picture}(0,0)
+\put(80,500){\includegraphics[height=2cm]{logo/cbs}\textrm{ }%
+\includegraphics[height=2cm]{logo/ul}\textrm{ }%
+\includegraphics[height=2cm]{logo/uu}\textrm{ }%
+\includegraphics[height=2cm]{logo/emos}}
+\end{picture}
+}
+
+
+\begin{document}
+\maketitle
+
+\thispagestyle{empty}
+\null
+\vfill{}
+\begin{description}[noitemsep]
+\item \version{}
+\item This work was created while the author worked at Statistics Netherlands.
+      The syllabus was used as a part of the EMOS course on data management
+      from 2021 to 2025.
+\item To the author's best knowledge, the cover picture was published first
+      by Stuart McMillan in the context of the UK government misreporting
+      the number of SARS-COVID-19 cases becase of faulty data management using Excel.
+      \href{https://twitter.com/mcmillanstu/status/1313520477919498246}{https://twitter.com/mcmillanstu/status/1313520477919498246} 
+
+\item Typeset with \LaTeX{}, \today.
+\end{description}
+
+
+
+
+\frontmatter
+
+\section*{Preface}
+\input{preface.tex}
+
+\section*{Reading guide}
+\input{reading_guide.tex}
+
+\section*{Acknowledgments}
+\input{acknowledgements.tex}
+
+\newpage
+\tableofcontents{}
+
+\mainmatter
+
+\input{faces_of_data.tex}
+
+\input{value_chain.tex}
+
+%\input{reproducibility.tex}
+
+\input{data_validation.tex}
+
+\input{relational_data.tex}
+
+\input{data_in_organization.tex}
+
+\input{information_models.tex}
+
+\addcontentsline{toc}{chapter}{Bibliography}
+\bibliography{datamanagement}
+
+\input{answers.tex}
+
+\addcontentsline{toc}{chapter}{Index}
+\printindex
+
+
+\end{document}
+
